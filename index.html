@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Probabilistic User Modeling</title>
+    <link rel="stylesheet" type="text/css" href="styles/main.css">
+    <link rel="stylesheet" type="text/css" href="styles/canvas.css">
+    <link rel="stylesheet" type="text/css" href="styles/toolbar.css">
+    <link rel="stylesheet" type="text/css" href="styles/pie.css">
+    <link rel="stylesheet" type="text/css" href="styles/popup.css">
+
+    <link rel="stylesheet" type="text/css" href="styles/material-icons/material-icons.css">
+    <script src="libraries/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+
+        <svg class="canvas">
+        
+            <defs>
+                <!-- arrowhead marker definition -->
+                <marker id="arrow-large" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6"
+                    orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A8A8B"/>
+                </marker>
+
+                <marker id="arrow-medium" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5"
+                    orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A8A8B"/>
+                </marker>
+
+                <marker id="arrow-small" viewBox="0 0 7 7" refX="3.5" refY="3.5" markerWidth="3.5" markerHeight="3.5"
+                    orient="auto-start-reverse">
+                    <path d="M 0 0 L 7 3.5 L 0 7 z" fill="#2B91F5"/>
+                </marker>
+        
+                <!-- simple dot marker definition -->
+                <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
+                    <circle cx="5" cy="5" r="5" fill="#2B91F5" />
+                </marker>
+            </defs>
+            
+            <network-link
+            v-for="link in links"
+            :key="link.id"
+            :class="[ currentSelectedLink && currentSelectedLink == link.id ? 'link-selected' : (link.hover ? 'link-hover': 'link-normal'), link.ignored ? 'ignored' : '' ]"
+            :x1="link.x1"
+            :y1="link.y1"
+            :x2="link.x2"
+            :y2="link.y2"
+            ></network-link>
+
+            <network-link
+            :class="[ linking ? 'link-selected' : '' ]"
+            v-bind="newLink"
+            :x1="newLink.x1"
+            :y1="newLink.y1"
+            :x2="newLink.x2"
+            :y2="newLink.y2"
+            ></network-link>
+        </svg>
+
+        <div 
+        class="canvas" 
+        id="container"
+        @mousedown="mouseDown"
+        @mouseup="mouseUp"
+        @mousemove="mouseMove"
+        >
+
+            <network-link-handle
+            v-for="link in links"
+            v-if="!getNodeById(link.src).ignored && !getNodeById(link.dest).ignored"
+            :key="link.id + 'link'"
+            :id="link.id"
+            :x1="link.x1"
+            :y1="link.y1"
+            :x2="link.x2"
+            :y2="link.y2"
+            :class="[ currentSelectedLink && currentSelectedLink == link.id ? 'link-handle-selected' : (link.hover ? 'link-handle-hover': ''), link.ignored ? 'ignored' : '' ]"
+            @mouse-enter="link.hover = true"
+            @mouse-leave="link.hover = false"
+            ></network-link-handle>
+
+            <node-info-panel
+            v-if="currentSelectedNode && !linking && !batchLinking && !getNodeById(currentSelectedNode).ignored"
+            :node="getNodeById(currentSelectedNode)"
+            @observe="query"
+            ></node-info-panel>
+
+            <pie
+            v-for="node in nodes"
+            v-if="!node.ignored"
+            :key="node.id + 'pie'"
+            :node="node"
+            ></pie>
+
+            <network-node
+            v-for="node in nodes"
+            :key="node.id + 'node'"
+            :id="node.id"
+            :title="node.title"
+            :value="node.observation == '' ? findMaxValue(node.values) : node.observation"
+            :x="node.x"
+            :y="node.y"
+            :class="{ select: currentSelectedNode && node.id == currentSelectedNode, hover: node.hover, ignored: node.ignored }"
+            @mouse-enter="node.hover = true"
+            @mouse-leave="node.hover = false"
+            ></network-node>
+        </div>
+
+        <div class="toolbar"
+        :class="{ hidden: currentSelectedLink || currentSelectedNode }">
+
+            <button
+            @click="loadData">
+                <i class="material-icons">equalizer</i> 
+                加载数据
+            </button>
+            
+            <button
+            :class="{ active: runningInference }"
+            @click="runningInference = !runningInference; query()"
+            >
+                <i class="material-icons">
+                    {{ runningInference ? 'pause' : 'play_arrow' }}
+                </i>
+                {{ runningInference ? '停止推理' : '开始推理' }}
+            </button>
+
+            <button
+            @click="saveData"
+            >
+                <i class="material-icons">save</i>
+                保存模型
+            </button>
+        </div>
+
+        <div class="toolbar"
+        :class="{ hidden: !currentSelectedLink || currentSelectedNode }">
+            <button
+            @click="deleteCurrentLink"
+            >
+                <i class="material-icons">delete</i>
+                删除关联
+            </button>
+        </div>
+
+        <div class="toolbar"
+        :class="{ hidden: currentSelectedLink || !currentSelectedNode }">
+            <button
+            v-if="currentSelectedNode && !getNodeById(currentSelectedNode).ignored"
+            :class="{ active: batchLinking }"
+            @click="batchLinking = !batchLinking" >
+                <i class="material-icons">border_color</i>
+                批量关联
+            </button>
+            <button
+            @click="toggleIgnore">
+                <i class="material-icons">{{ currentSelectedNode && getNodeById(currentSelectedNode).ignored ? "visibility" : "visibility_off" }}</i>
+                {{ currentSelectedNode && getNodeById(currentSelectedNode).ignored ? "取消忽略" : "忽略" }}
+            </button>
+        </div>
+
+        <div class="overlay"
+        :style="{ opacity: busy ? 0.2 : 0, 'z-index': busy ? 1002 : -100 }"
+        ></div>
+
+        <div class="popup"
+        :class="{ show: popupShowing }">
+            {{ popupText }}
+        </div>
+    </div>
+    <script src="scripts/node-info-panel.js"></script>
+    <script src="scripts/network-base.js"></script>
+    <script src="scripts/pie.js"></script>
+    
+    <script src="scripts/renderer.js"></script>
+</body>
+
+</html>

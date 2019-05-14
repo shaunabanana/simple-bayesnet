@@ -1,0 +1,24 @@
+.popup {
+    background: white;
+    height: 24px;
+    padding: 10px;
+    padding-left: 30px;
+    padding-right: 30px;
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    line-height: 24px;
+    vertical-align: center;
+    transform: translate(-50%, 0);
+    font-size: 14px;
+    border-radius: 40px;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: top 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    z-index: 1003;
+}
+
+.popup.show {
+    opacity: 1;
+    top: 20px;
+}

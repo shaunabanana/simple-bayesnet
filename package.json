@@ -1,0 +1,17 @@
+{
+  "name": "probabilistic-user-modeling",
+  "version": "0.1.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "./node_modules/.bin/electron .",
+    "build": "pyinstaller python/api.py --distpath python-build && ./node_modules/.bin/electron-packager . --overwrite --ignore=\"python$\" --ignore=\".git\" --out=release-builds"
+  },
+  "dependencies": {
+    "jquery": "^3.4.1",
+    "zerorpc": "git+https://github.com/fyears/zerorpc-node.git"
+  },
+  "devDependencies": {
+    "electron": "1.7.6",
+    "electron-packager": "9.0.1"
+  }
+}
