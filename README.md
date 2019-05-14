@@ -14,7 +14,7 @@ Change PyInstaller code in `/Library/Frameworks/Python.framework/Versions/3.6/li
 if 'Library/Frameworks' in path_to_tcl and 'Python' not in path_to_tcl:
 ```
 
-Comment out the dumb version checking code in `./node_modules/electron-packager/cli.js`:
+Comment out the version checking code in `./node_modules/electron-packager/cli.js`:
 
 ```javascript
 /*
