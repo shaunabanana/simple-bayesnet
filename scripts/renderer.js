@@ -490,7 +490,7 @@ app = new Vue({
                                     }
                                     this.nextLinkId = maxLinkId + 1;
 
-                                    this.layoutNodes();
+                                    //this.layoutNodes();
                                     this.updateLinkPositions();
                                 }
                             })
