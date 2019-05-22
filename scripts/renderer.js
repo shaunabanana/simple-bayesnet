@@ -599,18 +599,6 @@ app = new Vue({
             })
         },
 
-        findMaxValue: function (values) {
-            var maxValue = 0;
-            var maxValueName = null;
-            for (var i = 0; i < values.length; i++) {
-                if (values[i].probability > maxValue) {
-                    maxValue = values[i].probability;
-                    maxValueName = values[i].name;
-                }
-            }
-            return maxValueName;
-        },
-
         showPopup: function (text) {
             this.popupText = text;
             this.popupShowing = true;

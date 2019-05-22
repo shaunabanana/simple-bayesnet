@@ -74,14 +74,9 @@
             v-for="link in links"
             v-if="!getNodeById(link.src).ignored && !getNodeById(link.dest).ignored"
             :key="link.id + 'link'"
+            :link="link"
             :id="link.id"
-            :x1="link.x1"
-            :y1="link.y1"
-            :x2="link.x2"
-            :y2="link.y2"
             :class="[ currentSelectedLink && currentSelectedLink == link.id ? 'link-handle-selected' : (link.hover ? 'link-handle-hover': ''), link.ignored ? 'ignored' : '' ]"
-            @mouse-enter="link.hover = true"
-            @mouse-leave="link.hover = false"
             ></network-link-handle>
 
             <node-info-panel
@@ -100,14 +95,8 @@
             <network-node
             v-for="node in nodes"
             :key="node.id + 'node'"
-            :id="node.id"
-            :title="node.title"
-            :value="node.observation == '' ? findMaxValue(node.values) : node.observation"
-            :x="node.x"
-            :y="node.y"
+            :node="node"
             :class="{ select: currentSelectedNode && node.id == currentSelectedNode, hover: node.hover, ignored: node.ignored }"
-            @mouse-enter="node.hover = true"
-            @mouse-leave="node.hover = false"
             ></network-node>
         </div>
 

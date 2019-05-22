@@ -1,16 +1,29 @@
 Vue.component('network-node', {
-    props: ['id', 'title', 'value', 'x', 'y'],
+    props: ['node'],
     template: `
     <div 
     class="node unselectable" 
-    :id="id" 
-    :style="{ left: x + 'px', top: y + 'px' }" 
-    @mouseenter="$emit('mouse-enter')"
-    @mouseleave="$emit('mouse-leave')"
+    :id="node.id" 
+    :style="{ left: node.x + 'px', top: node.y + 'px' }" 
+    @mouseenter="node.hover = true"
+    @mouseleave="node.hover = false"
     > 
-        {{ title.length > 25 ? title.substr(0, 25) + '...' : title }} <br/> 
-        <div>{{ value }} </div>
-    </div>`
+        {{ node.title.length > 25 ? node.title.substr(0, 25) + '...' : node.title }} <br/> 
+        <div>{{ node.observation == '' ? findMaxValue(node.values) : node.observation }} </div>
+    </div>`,
+    methods: {
+        findMaxValue: function (values) {
+            var maxValue = 0;
+            var maxValueName = null;
+            for (var i = 0; i < values.length; i++) {
+                if (values[i].probability > maxValue) {
+                    maxValue = values[i].probability;
+                    maxValueName = values[i].name;
+                }
+            }
+            return maxValueName;
+        }
+    }
 })
 
 
@@ -30,12 +43,12 @@ Vue.component('network-link', {
 
 
 Vue.component('network-link-handle', {
-    props: ['x1', 'y1', 'x2', 'y2'],
+    props: ['link'],
     template: `
     <div
     class="link-handle"
-    @mouseenter="$emit('mouse-enter')"
-    @mouseleave="$emit('mouse-leave')"
-    :style="{ left: (x1 + x2) / 2 + 'px', top: (y1 + y2) / 2 + 'px' }" 
+    @mouseenter="link.hover = true"
+    @mouseleave="link.hover = false"
+    :style="{ left: (link.x1 + link.x2) / 2 + 'px', top: (link.y1 + link.y2) / 2 + 'px' }" 
     ></div>`
 })
