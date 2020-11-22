@@ -30,6 +30,7 @@ Vue.component('pie', {
         },
         getColor: function(numColors, index) {
             var colors = {
+                1: [ '#FF7675' ],
                 2: [ '#FF7675', '#74B9FF' ],
                 3: [ '#FF7675', '#FDCB6E', '#74B9FF' ],
                 4: [ '#FF7675', '#FDCB6E', '#55EFC4', '#74B9FF' ],
