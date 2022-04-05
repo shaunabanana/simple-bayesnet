@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Probabilistic User Modeling</title>
+    <title>Simple Bayesian Networks</title>
     <link rel="stylesheet" type="text/css" href="styles/main.css">
     <link rel="stylesheet" type="text/css" href="styles/canvas.css">
     <link rel="stylesheet" type="text/css" href="styles/toolbar.css">
@@ -11,7 +11,9 @@
     <link rel="stylesheet" type="text/css" href="styles/popup.css">
 
     <link rel="stylesheet" type="text/css" href="styles/material-icons/material-icons.css">
+    <script type="text/javascript" src="/eel.js"></script>
     <script src="libraries/vue.js"></script>
+    <script src="libraries/jquery.js"></script>
 </head>
 
 <body>
@@ -103,10 +105,11 @@
         <div class="toolbar"
         :class="{ hidden: currentSelectedLink || currentSelectedNode }">
 
+            <input type="file" id="file" @change="gotFilePath">
             <button
             @click="loadData">
                 <i class="material-icons">equalizer</i> 
-                加载数据
+                Load Dataset
             </button>
             
             <button
@@ -116,14 +119,14 @@
                 <i class="material-icons">
                     {{ runningInference ? 'pause' : 'play_arrow' }}
                 </i>
-                {{ runningInference ? '停止推理' : '开始推理' }}
+                {{ runningInference ? 'Stop Inference' : 'Start Inference' }}
             </button>
 
             <button
             @click="saveData"
             >
                 <i class="material-icons">save</i>
-                保存模型
+                Save Model
             </button>
         </div>
 
@@ -133,7 +136,7 @@
             @click="deleteCurrentLink"
             >
                 <i class="material-icons">delete</i>
-                删除关联
+                Delete Link
             </button>
         </div>
 
@@ -144,12 +147,12 @@
             :class="{ active: batchLinking }"
             @click="batchLinking = !batchLinking" >
                 <i class="material-icons">border_color</i>
-                批量关联
+                Batch Linking
             </button>
             <button
             @click="toggleIgnore">
                 <i class="material-icons">{{ currentSelectedNode && getNodeById(currentSelectedNode).ignored ? "visibility" : "visibility_off" }}</i>
-                {{ currentSelectedNode && getNodeById(currentSelectedNode).ignored ? "取消忽略" : "忽略" }}
+                {{ currentSelectedNode && getNodeById(currentSelectedNode).ignored ? "Un-ignore" : "Ignore" }}
             </button>
         </div>
 

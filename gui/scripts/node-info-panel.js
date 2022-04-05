@@ -44,7 +44,7 @@ Vue.component('node-info-panel', {
             :color="getColor(node.values.length, index)"
             ></node-graph-item>
 
-            <div class="node-info-subtitle"> 设定观测值 </div>
+            <div class="node-info-subtitle"> Set observation </div>
 
             <span
             v-for="value in node.values"

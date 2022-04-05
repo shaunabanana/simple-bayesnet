@@ -1,3 +1,10 @@
+#file {
+    position: fixed;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
 .toolbar {
     position: fixed;
     bottom: 20px;

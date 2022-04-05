@@ -1,18 +1,9 @@
-window.$ = window.jQuery = require('jquery');
-const { dialog } = require('electron').remote
-const zerorpc = require("zerorpc")
-var fs = require('fs');
-
-//Connect to python backend
-let client = new zerorpc.Client()
-client.connect("tcp://127.0.0.1:4242")
-
 app = new Vue({
     el: '#app',
     data: {
         dataset: "",
 
-        nextNodeId: 1,
+        nextNodeId: 1, 
         nextLinkId: 1,
         currentNode: null,
         currentLink: null,
@@ -424,108 +415,82 @@ app = new Vue({
                 )
             }
             this.layoutNodes();
-            client.invoke("getData", null, (error, result) => {
-                if (error) {
-                    console.error(error);
-                    this.showHidePopup(error);
-                } else {
-                    this.dataset = result;
-                }
-            })
+
+            eel.getData()(result => {
+                console.log(result);
+                this.dataset = result;
+            });
         },
 
         loadData: function () {
-            var path = dialog.showOpenDialog({
-                properties: ['openFile'],
-                filters: [
-                    { name: '模型或Excel数据', extensions: ['xlsx', 'usermodel'] },
-                ]
-            });
+            $('#file').trigger('click');
+        },
 
-            if (path) {
-                path = path[0];
-                if ( path.substr(path.length - 4, 4) == 'xlsx' ) {
-                    client.invoke("loadFile", path, (error, result) => {
-                        if (error) {
-                            console.error(error);
-                            this.showHidePopup(error);
-                        } else {
-    
+        gotFilePath: function (event) {
+            console.log(event.target.files);
+
+            if (event.target.files && event.target.files.length > 0) {
+                let filename = event.target.files[0].name;
+                let reader = new FileReader();
+                reader.onload = () => {
+                    this.resetAll();
+                    if ( filename.substr(filename.length - 5, 5) === '.json' ) {
+                        eel.loadModel(reader.result)(model => {
+                            var model = JSON.parse(model);
+                            console.log(model);
                             this.resetAll();
-    
-                            variables = JSON.parse(result);
-                            this.initVariables(variables);
-                        }
-                    })
-                } else {
-                    fs.readFile(path, 'utf-8', (error, result) => {
-                        if (error) {
-                            console.error(error);
-                            this.showHidePopup(error);
-                        } else {
-                            var userModel = JSON.parse(result);
-                            console.log(userModel);
-                            client.invoke("loadModel", userModel, (error, result) => {
-                                if (error) {
-                                    console.error(error);
-                                    this.showHidePopup(error);
-                                } else {
-                                    this.resetAll();
 
-                                    var maxNodeId = 0;
-                                    for (var i = 0; i < userModel.nodes.length; i++) {
-                                        this.nodes.push( userModel.nodes[i] );
-                                        if (userModel.nodes[i].id > maxNodeId) {
-                                            maxNodeId = userModel.nodes[i].id;
-                                        }
-                                    }
-                                    this.nextNodeId = maxNodeId + 1;
+                            this.dataset = model.dataset
 
-                                    var maxLinkId = 0;
-                                    for (var i = 0; i < userModel.links.length; i++) {
-                                        this.links.push( userModel.links[i] );
-                                        if (userModel.links[i].id > maxLinkId) {
-                                            maxLinkId = userModel.links[i].id;
-                                        }
-                                    }
-                                    this.nextLinkId = maxLinkId + 1;
-
-                                    //this.layoutNodes();
-                                    this.updateLinkPositions();
+                            var maxNodeId = 0;
+                            for (var i = 0; i < model.nodes.length; i++) {
+                                this.nodes.push( model.nodes[i] );
+                                if (model.nodes[i].id > maxNodeId) {
+                                    maxNodeId = model.nodes[i].id;
                                 }
-                            })
-                        }
-                    });
+                            }
+                            this.nextNodeId = maxNodeId + 1;
+
+                            var maxLinkId = 0;
+                            for (var i = 0; i < model.links.length; i++) {
+                                this.links.push( model.links[i] );
+                                if (model.links[i].id > maxLinkId) {
+                                    maxLinkId = model.links[i].id;
+                                }
+                            }
+                            this.nextLinkId = maxLinkId + 1;
+
+                            //this.layoutNodes();
+                            this.updateLinkPositions();
+                        });
+                    } else {
+                        eel.loadFile(filename, reader.result)(variables => {
+                            console.log(variables);
+                            this.initVariables(JSON.parse(variables));
+                        });
+                    }
                 }
-                
+                reader.readAsDataURL(event.target.files[0]);
             }
         },
 
-        saveData: function () {
-            var path = dialog.showSaveDialog({
-                properties: ['openFile'],
-                filters: [
-                    { name: '用户模型', extensions: ['usermodel'] },
-                ]
-            });
-            if (path) {
-                var userModel = {
-                    dataset: this.dataset,
-                    nodes: this.nodes,
-                    links: this.links,
-                    modelStructure: this.getModelStructure()
-                };
+        download(content, fileName, contentType) {
+            var a = document.createElement("a");
+            var file = new Blob([content], {type: contentType});
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+        },
 
-                fs.writeFile(path, JSON.stringify(userModel), 'utf-8', (error, result) => {
-                    if (error) {
-                        console.error(error);
-                        this.showHidePopup(error);
-                    } else {
-                        this.showHidePopup("保存成功!");
-                        console.log(result);
-                    }
-                });
-            }
+        saveData: function () {
+            var userModel = {
+                dataset: this.dataset,
+                nodes: this.nodes,
+                links: this.links,
+                modelStructure: this.getModelStructure()
+            };
+
+            this.download(JSON.stringify(userModel), 'model.json', 'text/json');
         },
 
         getModelStructure: function () {
@@ -546,15 +511,8 @@ app = new Vue({
         },
 
         updateModel: function () {
-
-            client.invoke("updateModel", JSON.stringify( this.getModelStructure() ), (error, result) => {
-                if (error) {
-                    console.error(error);
-                    this.showHidePopup(error);
-                } else {
-                    this.query();
-                }
-            })
+            eel.updateModel(JSON.stringify(this.getModelStructure()))();
+            this.query();
         },
 
         query: function () {
@@ -572,7 +530,7 @@ app = new Vue({
                             if (this.nodes[i].observation == '') {
                                 query.variables.push(this.nodes[i].title)
                             } else {
-                                query.evidence[this.nodes[i].title] = Number(this.nodes[i].observation);
+                                query.evidence[this.nodes[i].title] = this.nodes[i].observation;
                             }
                             break;
                         }
@@ -581,22 +539,19 @@ app = new Vue({
             }
 
             this.busy = true;
-            this.showPopup("推理中……")
+            this.showPopup("Running inteference...")
+            console.log('Reasoning...');
 
-            client.invoke("query", JSON.stringify(query), (error, result) => {
-                if (error) {
-                    console.error(error);
-                    this.showHidePopup(error);
-                } else {
-                    result = JSON.parse(result);
+            eel.query(JSON.stringify(query))( result => {
+                console.log('Done reasoning.');
+                result = JSON.parse(result);
 
-                    for (var i = 0; i < result.length; i++) {
-                        this.modifyNode( result[i].title, result[i].values )
-                    }
-                    this.hidePopup()
+                for (var i = 0; i < result.length; i++) {
+                    this.modifyNode( result[i].title, result[i].values )
                 }
+                this.hidePopup();
                 this.busy = false;
-            })
+            });
         },
 
         showPopup: function (text) {

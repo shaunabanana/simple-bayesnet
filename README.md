@@ -1,28 +1,17 @@
-# Probabilistic User Modeling
+# SimpleBN
+A simple visual tool to build and run inference on your own Bayesian Network.
 
-## Development
+![screenshot](./assets/screenshot.png)
 
-1. Setup Electron 1.7.6 with zeromq to communicate with Python as described [here](https://github.com/fyears/electron-python-example).
+## How to use
+You need to have [Python 3](https://www.python.org/downloads/) installed.
 
-2. Install pgmpy, pandas and xlrd using pip.
-
-## Packaging
-
-Change PyInstaller code in `/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/PyInstaller/hooks/hook-_tkinter.py` line 183 to:
-
-```python
-if 'Library/Frameworks' in path_to_tcl and 'Python' not in path_to_tcl:
+Open up your favorite terminal, and run the following command to install the required libraries:
+```
+pip install eel pandas openpyxl pgmpy python-datauri
 ```
 
-Comment out the version checking code in `./node_modules/electron-packager/cli.js`:
-
-```javascript
-/*
-if (nodeVersionInfo < [4, 0, 0]) {
-  console.error('CANNOT RUN WITH NODE ' + process.versions.node)
-  console.error('Electron Packager requires Node 4.0 or above.')
-  process.exit(1)
-}
-*/
+Finally, in the base directory of this repo, start `app.py` to see the GUI:
 ```
-
+python app.py
+```
