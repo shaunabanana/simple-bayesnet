@@ -109,11 +109,12 @@
             <button
             @click="loadData">
                 <i class="material-icons">equalizer</i> 
-                Load Dataset
+                Load Dataset/Model
             </button>
             
             <button
             :class="{ active: runningInference }"
+            :disabled="nodes.length === 0"
             @click="runningInference = !runningInference; query()"
             >
                 <i class="material-icons">

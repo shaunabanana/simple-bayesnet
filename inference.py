@@ -21,7 +21,13 @@ class InferenceEngine:
     def load_model(self, model):
         self.data = pd.read_json(model['dataset'])
         self.variables = list(self.data.columns)
-        self.model = BayesianNetwork(model['modelStructure'])
+        if len(model['modelStructure']) > 0:
+            self.model = BayesianNetwork(model['modelStructure'])
+        else:
+            self.model = BayesianNetwork()
+        
+        for var in self.variables:
+            self.model.add_node(var)
         self.model.fit(self.data, estimator=MaximumLikelihoodEstimator)
 
 
