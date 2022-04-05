@@ -1,5 +1,5 @@
 # SimpleBN
-A simple visual tool to build and run inference on your own Bayesian Network.
+A simple visual tool to build and run inference on your own Bayesian Network. Originally written for my undergraduate thesis.
 
 ![screenshot](./assets/screenshot.png)
 
