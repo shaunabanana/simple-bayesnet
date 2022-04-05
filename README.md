@@ -39,8 +39,20 @@ A sample excerpt of the mushroom dataset is included for your reference in the `
 
 Alternatively, you can also load a model you have saved.
 
+### Reading the visualization
+You'll notice that each variable has a ring surrounding it. This is a pie chart showing the distribution of values of this variable.
+
+When you click on a variable, a panel shows up. This panel shows you the detailed distribution statistics, as well as buttons for you to set a specific observed value to that variable, thus "conditioning" it.
+
+### Defining network structure
+ When a variable is selected, you can drag from it onto another variable to create a link. Alternatively, you can select a variable and click "Batch Linking," this way you can simply click on other variables to create links.
+
+To remove a link, click on the circle handle of that link and click the "Delete Link" button.
+
+If a variable is irrelavent, you can also select it and click "Ignore," so that it will not participate in any inferences.
+
 ### Running inference
-Click "Start Inference" to start running inference. Depending on your model complexity and dataset size, it may take some time to finish.
+Click "Start Inference" to start running inference. Depending on your model complexity and dataset size, it may take some time to finish. When inference is activated, any changes you make will trigger another inference, and the visualization stays updated.
 
 ### Saving models
 The models are saved as a json file. You can click the "Load Dataset/Model" button to load it again.
