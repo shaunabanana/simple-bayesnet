@@ -39,6 +39,11 @@ A sample excerpt of the mushroom dataset is included for your reference in the `
 
 Alternatively, you can also load a model you have saved.
 
+### Defining network structure
+Click on any node to see the detailed distribution of this variable. When a variable is selected, you can drag from it onto another variable to create a link. Alternatively, you can select a variable and click "Batch Linking," this way you can simply click on other variables to create links.
+
+To remove a link, click on the circle handle of that link and click the "Delete Link" button.
+
 ### Running inference
 Click "Start Inference" to start running inference. Depending on your model complexity and dataset size, it may take some time to finish.
 
