@@ -79,6 +79,7 @@ def query(query_string):
 
     query = json.loads(query_string)
     result = engine.query( query["variables"], query["evidence"] )
+    print(result)
 
     reply = []
     for var in query["variables"]:
