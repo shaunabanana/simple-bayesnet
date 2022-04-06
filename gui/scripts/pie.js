@@ -36,7 +36,10 @@ Vue.component('pie', {
                 4: [ '#FF7675', '#FDCB6E', '#55EFC4', '#74B9FF' ],
                 5: [ '#FF7675', '#FAB1A0', '#FDCB6E', '#55EFC4', '#74B9FF' ],
                 6: [ '#FF7675', '#FAB1A0', '#FDCB6E', '#55EFC4', '#25DFE5', '#74B9FF' ],
-                7: [ '#FF7675', '#FAB1A0', '#FFEAA7', '#FDCB6E', '#55EFC4', '#25DFE5', '#74B9FF' ]
+                7: [ '#FF7675', '#FAB1A0', '#FFEAA7', '#FDCB6E', '#55EFC4', '#25DFE5', '#74B9FF' ],
+                8: [ '#FF7675', '#FAB1A0', '#FFEAA7', '#FDCB6E', '#55EFC4', '#25DFE5', '#74B9FF', '#A698FF' ],
+                9: [ '#FF7675', '#FAB1A0', '#FFEAA7', '#FDCB6E', 'B1E18C', '#55EFC4', '#25DFE5', '#74B9FF', '#A698FF' ],
+                10: [ '#FF7675', '#FAB1A0', '#FFEAA7', '#FDCB6E', 'B1E18C', '#55EFC4', '#25DFE5', '#74B9FF', '#A698FF', '#FF8FC5' ]
             }
             return colors[numColors][index];
         },
